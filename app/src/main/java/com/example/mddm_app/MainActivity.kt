@@ -1,7 +1,10 @@
 package com.example.mddm_app
 
+import android.content.Intent
+import android.content.SharedPreferences
 import android.os.AsyncTask
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
 import android.view.Menu
@@ -17,7 +20,7 @@ import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
-    val CITY: String = "Zlin,cz"
+    var CITY: String = "Zlin,cz"
     val API: String = "3fb82464b729b1e70524ff5ceb18e04e" // Use API key
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -26,9 +29,25 @@ class MainActivity : AppCompatActivity() {
         setSupportActionBar(findViewById(R.id.toolbar))
     }
 
+
     override fun onStart() {
         super.onStart()
+    }
+
+    public fun updateWeather() {
+
+        val sharedPref: SharedPreferences = getSharedPreferences()
+        val lat: String? = sharedPref.getString(R.string.destinationKey.toString(), "")
+        if (!lat.isNullOrEmpty()){
+            CITY = lat
+        }
+
         weatherTask().execute()
+    }
+
+    public fun getSharedPreferences() : SharedPreferences {
+        //return this.getSharedPreferences("APP", Context.MODE_PRIVATE)
+        return  PreferenceManager.getDefaultSharedPreferences(applicationContext)
     }
 
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
@@ -42,7 +61,11 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         return when (item.itemId) {
-            R.id.action_settings -> true
+            R.id.action_settings -> {
+                startActivity(Intent(this@MainActivity, SettingsActivity::class.java))
+                finish()
+                return true
+            }
             else -> super.onOptionsItemSelected(item)
         }
     }
